@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CreateRestaurantController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RestaurantController;
+use App\Http\Controllers\ReviewController;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -66,8 +68,18 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::post('/add-review', [HomeController::class, 'addReview'])->name('add-review');
-    
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/restaurant/{id}', [RestaurantController::class, 'index'])->name('restaurant.index');
+    Route::post('/add-review', [RestaurantController::class, 'addReview'])->name('restaurant.addReview');
+    Route::get('/restaurant/{id}/edit', [RestaurantController::class, 'edit'])->name('restaurant.edit');
+    Route::post('/restaurant/{id}', [RestaurantController::class, 'update'])->name('restaurant.update');
+    Route::delete('/restaurant/{id}/delete', [RestaurantController::class, 'destroy'])->name('restaurant.destroy');
+
+    Route::get('/review/{id}/edit', [ReviewController::class, 'edit'])->name('review.edit');
+    Route::post('/review/{id}', [ReviewController::class, 'update'])->name('review.update');
+    Route::delete('/review/{id}/delete', [ReviewController::class, 'destroy'])->name('review.destroy');
 });
 
 require __DIR__.'/auth.php';
