@@ -85,9 +85,9 @@ function getRatingofRestaurant(restaurant) {
                                     </div>
                                     <div v-if="restaurant.user.id == props.auth.user.id">
                                         <a :href="'/restaurant/' + restaurant.id + '/edit'"
-                                            class="text-blue-500 hover:text-blue-600">Edit</a>
+                                            class="text-white bg-blue-500 px-4 py-2 rounded-md mr-2">Edit</a>
                                         <a @click="deleteRestaurant(restaurant.id)"
-                                            class="text-red-500 hover:text-red-600">Delete</a>
+                                            class="text-white bg-red-500 px-4 py-2 rounded-md cursor-pointer">Delete</a>
                                     </div>
                                 </div>
                                 <img src="https://toohotel.com/wp-content/uploads/2022/09/TOO_restaurant_Panoramique_vue_Paris_nuit_v2-scaled.jpg"
@@ -140,11 +140,11 @@ function getRatingofRestaurant(restaurant) {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div v-if="review.user.id == props.auth.user.id">
+                                        <div v-if="review.user.id == props.auth.user.id" class="mt-12">
                                             <a :href="'/review/' + review.id + '/edit'"
-                                                class="text-blue-500 hover:text-blue-600">Edit</a>
+                                                class="text-white bg-blue-500 px-4 py-2 rounded-md mr-2">Edit</a>
                                             <a @click="deleteReview(review.id)"
-                                                class="text-red-500 hover:text-red-600">Delete</a>
+                                                class="text-white bg-red-500 px-4 py-2 rounded-md cursor-pointer">Delete</a>
                                         </div>
                                     </div>
                                     <div class="flex mt-4">

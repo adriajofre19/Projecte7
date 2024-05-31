@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
@@ -7,6 +7,7 @@ import { Head, Link, useForm } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
 import Map from '@/Components/Map.vue';
 import UserCard from '@/Components/UserCard.vue';
+import { computed } from 'vue';
 
 const props = defineProps({
     auth: {
@@ -33,16 +34,38 @@ function getRatingofRestaurant(restaurant) {
     }
 }
 
-const LatAndLongFromAllRestaurants = () => {
-    let latAndLong = [];
-    props.restaurants.forEach(restaurant => {
-        latAndLong.push({
-            lat: restaurant.latitude,
-            long: restaurant.longitude
-        });
+
+
+import L from 'leaflet';
+
+onMounted(() => {
+    // set view to the first restaurant
+    const map = L.map('map').setView([props.restaurants[0].latitude, props.restaurants[0].longitude], 6);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    filteredRestaurants.value.forEach(restaurant => {
+        L.marker([restaurant.latitude, restaurant.longitude]).addTo(map)
+            .bindPopup(restaurant.name)
+            .openPopup();
     });
-    return latAndLong;
-}
+});
+
+
+
+const selectedRating = ref('');
+
+const filteredRestaurants = computed(() => {
+    return props.restaurants.filter(restaurant => {
+        return getRatingofRestaurant(restaurant) >= selectedRating.value;
+    });
+});
+
+
+
+
 
 
 
@@ -50,16 +73,33 @@ const LatAndLongFromAllRestaurants = () => {
 
 <template>
     <AuthenticatedLayout>
-        <Map v-for="restaurant in props.restaurants" :key="restaurant.id" :restaurant="restaurant" />
-        <UserCard :restaurants="props.restaurants" :auth="props.auth" :latAndLong="latAndLong" />
+
+        <div class="flex items-center justify-center mt-8">
+            <select v-model="selectedRating" class="w-1/4 p-2 rounded-lg border border-gray-200 dark:border-gray-800">
+                <option value="">All</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+
         <section>
 
             <div class="py-16">
                 <div class="mx-auto px-6 max-w-6xl text-gray-500">
                     <div class="relative">
                         <div class="relative z-10 grid gap-3 grid-cols-6">
+                            <div
+                                class="col-span-full lg:col-span-6 overflow-hidden relative p-8 rounded-xl bg-white border border-gray-200 dark:border-gray-800 dark:bg-gray-900">
+                                <div id="map" ref="mapContainer">
+                                    
+                                </div>
+                            </div>
 
-                            <div v-for="restaurant in props.restaurants" :key="restaurant.id"
+                            <div v-for="restaurant in filteredRestaurants" :key="restaurant.id"
                                 class="col-span-full lg:col-span-6 overflow-hidden relative p-8 rounded-xl bg-white border border-gray-200 dark:border-gray-800 dark:bg-gray-900">
 
                                 <a :href="'/restaurant/' + restaurant.id">
@@ -149,3 +189,11 @@ const LatAndLongFromAllRestaurants = () => {
 
     </AuthenticatedLayout>
 </template>
+
+<style>
+#map {
+    width: 100%;
+    height: 500px;
+    border-radius: 10px;
+}
+</style>
